@@ -62,7 +62,7 @@ namespace WellVet_v2.Controllers
                 }
                 ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
             }
-            return View(loginUser);
+            return View();
         }
 
         // GET: Users

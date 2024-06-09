@@ -58,5 +58,76 @@ namespace WellVet_v2.Controllers
             return View(post);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddComment([FromBody] Comment comment)
+        {
+            if (comment != null)
+            {
+
+
+                // Kullanıcıyı veritabanında bul
+                var user = UsersController.user;
+
+                if (user != null)
+                {
+                    // Kullanıcı bulundu, gönderi bilgilerini kaydet
+                    comment.UserId = user.Id;
+                    _context.Add(comment);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    // Kullanıcı bulunamadı, hata ekleyin
+                    ModelState.AddModelError(string.Empty, "Kullanıcı bulunamadı.");
+                }
+            }
+
+            return Ok(comment);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Comments([FromQuery] int postId)
+        {
+            var comments = await _context.Comments.Include(x => x.User).Where(x => x.PostId == postId && !x.IsDeleted).ToListAsync();
+
+            return Ok(comments);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteComment(int commentId)
+        {
+
+            var currentCommnet = await _context.Comments.Where(x => x.Id == commentId).FirstOrDefaultAsync();
+
+            if (currentCommnet != null)
+            {
+                currentCommnet.IsDeleted = true;
+                _context.Update(currentCommnet);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+
+            }
+
+            return View();
+        }
+        
+        [HttpDelete]
+        public async Task<IActionResult> DeletePost(int postId)
+        {
+
+            var currentCommnet = await _context.Posts.Where(x => x.Id == postId).FirstOrDefaultAsync();
+
+            if (currentCommnet != null)
+            {
+                _context.Remove(currentCommnet);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+
+            }
+
+            return View();
+        }
+
     }
 }
