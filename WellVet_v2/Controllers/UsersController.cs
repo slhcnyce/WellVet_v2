@@ -30,6 +30,7 @@ namespace WellVet_v2.Controllers
         {
             if (user != null)
             {
+                user.UserTypeId = user.IsVeterinarian ? 5 : 3;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Login", "Users");
@@ -57,7 +58,7 @@ namespace WellVet_v2.Controllers
                 {
                     UsersController.user = user;
                     // Oturum işlemleri burada yapılabilir.
-                    return RedirectToAction("Index", "Posts");
+                    return RedirectToAction("Index", "Posts",user);
                 }
                 ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
             }
