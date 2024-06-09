@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WellVet_v2.Models
 {
@@ -7,6 +8,8 @@ namespace WellVet_v2.Models
     {
         public int Id { get; set; }
 
+        [ForeignKey(nameof(UserType))]
+        public int UserTypeId { get; set; } = 3;
         [Required]
         [StringLength(50)]
         public string FirstName { get; set; }
@@ -25,7 +28,9 @@ namespace WellVet_v2.Models
         public string Password { get; set; }
 
         public bool IsVeterinarian { get; set; }
+        
 
         public ICollection<Post> Posts { get; set; }
+        public UserType UserType { get; set; }
     }
 }

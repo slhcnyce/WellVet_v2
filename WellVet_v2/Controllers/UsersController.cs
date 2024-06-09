@@ -10,13 +10,13 @@ namespace WellVet_v2.Controllers
     public class UsersController : Controller
     {
         private readonly WellVet_v2AppContext _context;
+        public static User? user { get; set; }
 
         public UsersController(WellVet_v2AppContext context)
         {
             _context = context;
 
         }
-        public static User? user { get; set; }
         // GET: Users/Register
         public IActionResult Register()
         {
