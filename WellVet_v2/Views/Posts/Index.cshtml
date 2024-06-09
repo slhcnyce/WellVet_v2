@@ -1,0 +1,43 @@
+﻿@model IEnumerable<WellVet_v2.Models.Post>
+
+@{
+    ViewData["Title"] = "Gönderiler";
+}
+
+<h1>Gönderiler</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Kullanıcı
+            </th>
+            <th>
+                İçerik
+            </th>
+            <th>
+                Tarih
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.User.FirstName @item.User.LastName
+                </td>
+                <td>
+                    @item.Content
+                </td>
+                <td>
+                    @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Create">Yeni Gönderi Oluştur</a>
+</div>
