@@ -37,18 +37,33 @@
                     @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
                 </td>
                 <td>
-                    <tr>
-                        
-                            @if( item.User.UserTypeId == 5){
-                    <td>
-                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCommentModal">
-                                Yorum Ekle
-                            </button>
-                    </td>
-                            } 
-                           
-                       
-                    </tr>
+
+
+                    @if (item.User.UserTypeId == 5)
+                    {
+
+                        <button type="button" class="btn btn-primary" onclick="AddCommnetPrepare(@item.Id)">
+                            Yorum Ekle
+                        </button>
+
+                    }
+                    else
+                    {
+
+                        <button type="button" class="btn btn-primary" onclick="DeletePost(@item.Id)">
+                            Sil
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="AddCommnetPrepare(@item.Id)">
+                            Yorum Ekle
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="GetCommets(@item.Id)">
+                            Yorumlar
+                        </button>
+
+                    }
+
+
+
                 </td>
             </tr>
         }
@@ -59,8 +74,30 @@
     <a asp-action="Create">Yeni Gönderi Oluştur</a>
 </div>
 
-<!-- Modal -->
+<!--Add Comment Modal -->
 <div class="modal fade" id="addCommentModal" tabindex="-1" aria-labelledby="addCommentModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Yorum Ekleme</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-floating">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                    <label for="floatingTextarea2">Comments</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" data-post-id="" id="btn-add-comment" onclick="AddCommnet()">Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comments Modal -->
+<div class="modal fade" id="commentsModal" tabindex="-1" aria-labelledby="commentsModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -68,15 +105,114 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ...
+                <table class="table" id="table-comments">
+                    <thead>
+                        <tr>
+                            <th>
+                                Kullanıcı Adı
+                            </th>
+                            <th>
+                                Yorum
+                            </th>
+                            <th>
+                                Tarih
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
             </div>
         </div>
     </div>
 </div>
+
 <script>
+
+    function AddCommnetPrepare(id) {
+
+        $('#addCommentModal').modal('show');
+        $("#btn-add-comment").attr("data-post-id", id);
+    }
+
+    function AddCommnet() {
+
+        var comment = {};
+        comment.Content = $("#floatingTextarea2").val();
+        comment.PostId = $("#btn-add-comment").attr("data-post-id");
+        $.ajax({
+            type: 'POST',
+            url: '/Posts/AddComment',
+            data: JSON.stringify(comment),
+            contentType: 'application/json',
+        })
+            .done((data) => {
+                console.log({ data });
+                $('#addCommentModal').modal('hide');
+            })
+            .fail((err) => {
+                console.error(err);
+            });
+    }
+
+    function DeleteCommnet(id) {
+        
+        $.ajax({
+            type: 'DELETE',
+            url: '/Posts/DeleteComment?commentId=' + id,
+
+            contentType: 'application/json',
+        })
+            .done((data) => {
+                
+            })
+            .fail((err) => {
+                console.error(err);
+            });
+    }
+    
+    function DeletePost(id) {
+        
+        $.ajax({
+            type: 'DELETE',
+            url: '/Posts/DeletePost?postId=' + id,
+
+            contentType: 'application/json',
+        })
+            .done((data) => {
+                
+            })
+            .fail((err) => {
+                console.error(err);
+            });
+    }
+
+    function GetCommets(id) {
+        $('#commentsModal').modal('show');
+        $('#table-comments tbody').html("");
+        $.ajax({
+            type: 'GET',
+            url: '/Posts/Comments?postId=' + id,
+            contentType: 'application/json',
+        })
+            .done((data) => {
+
+                data.forEach(function (item) {
+                    var newRow = `<tr>
+                                        <td>${item.user.firstName}</td>
+                                        <td>${item.content}</td>
+                                        <td>${item.createdAt}</td>
+                                      </tr>`;
+                    $('#table-comments tbody').append(newRow);
+                });
+            })
+            .fail((err) => {
+                console.error(err);
+            });
+    }
+
 
 </script>
